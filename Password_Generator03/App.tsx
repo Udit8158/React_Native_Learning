@@ -28,21 +28,21 @@ const PasswordValidation = object({
     .required('Passsword length is required'),
 });
 
-// state
-const [password, setPassword] = useState('');
-const [isPasswordGenerated, setIsPasswordGenerated] = useState(false);
-
-const [lowercase, setLowercase] = useState(false);
-const [uppercase, setUppercase] = useState(false);
-const [numbers, setNumbers] = useState(false);
-const [symbols, setSymbols] = useState(false);
-
-// Functions
-const generatePassword = (passwordLength: number) => {};
-const createPassword = (characters: string, passwordLength: number) => {};
-const resetPassword = () => {};
-
 function App(): JSX.Element {
+  // state
+  const [password, setPassword] = useState('');
+  const [isPasswordGenerated, setIsPasswordGenerated] = useState(false);
+
+  const [lowercase, setLowercase] = useState(false);
+  const [uppercase, setUppercase] = useState(false);
+  const [numbers, setNumbers] = useState(false);
+  const [symbols, setSymbols] = useState(false);
+
+  // Functions
+  const generatePassword = (passwordLength: number) => {};
+  const createPassword = (characters: string, passwordLength: number) => {};
+  const resetPassword = () => {};
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
