@@ -2,17 +2,12 @@ import React, {useState} from 'react';
 import {
   Dimensions,
   SafeAreaView,
-  ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TextInput,
-  TouchableOpacity,
-  useColorScheme,
   View,
+  Clipboard,
 } from 'react-native';
-
-import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 // Form Validation By Yup
 import {object, number} from 'yup';
@@ -42,9 +37,19 @@ function App() {
   const [numbers, setNumbers] = useState(3);
   const [symbols, setSymbols] = useState(1);
 
+  const [error, setError] = useState(null);
+  const [isPasswordCopied, setIsPasswordCopied] = useState(false);
+
   // Functions
   const generatePassword = () => {
     // console.warn(lowercase, uppercase, numbers, symbols)
+    if (passwordLength < 6 || passwordLength > 14) {
+      setError('Password length must be between 6 and 14');
+      setTimeout(() => {
+        setError(null)
+      }, 3000);
+      return;
+    }
     if (lowercase + uppercase + numbers + symbols === passwordLength) {
       setIsPasswordGenerated(true);
       let paswdChars = [];
@@ -76,25 +81,27 @@ function App() {
       }
       // shuffeling the password characters
       paswdChars = paswdChars
-      .map(value => ({value, sort: Math.random()}))
-      .sort((a, b) => a.sort - b.sort)
-      .map(({value}) => value);
-      
+        .map(value => ({value, sort: Math.random()}))
+        .sort((a, b) => a.sort - b.sort)
+        .map(({value}) => value);
+
       // console.warn(paswdChars)
       let paswd = '';
 
       // generating the actual password
       for (let i = 0; i < passwordLength; i++) {
         // console.warn(i)
-        paswd +=
-          paswdChars[i];
+        paswd += paswdChars[i];
       }
 
       // setting password
       // console.warn(paswd);
-      setPassword(paswd)
+      setPassword(paswd);
     } else {
-      console.warn("Select correct numbers")
+      setError('Select correct numbers of input');
+      setTimeout(() => {
+        setError(null);
+      }, 3000);
     }
   };
 
@@ -110,7 +117,13 @@ function App() {
     setIsPasswordGenerated(false);
   };
 
-
+  const copyToClipboard = () => {
+    Clipboard.setString(password);
+    setIsPasswordCopied(true);
+    setTimeout(() => {
+      setIsPasswordCopied(false);
+    }, 3000);
+  };
 
   return (
     <SafeAreaView>
@@ -182,16 +195,34 @@ function App() {
       </View>
 
       {/* Generate Password Btn */}
-     <CustomButton text={'Generate Password'} btnFunc={() => generatePassword()}/>
-        {/* Result Password Container */}
-        {(isPasswordGenerated && <View style={styles.passwordResultContainer}>
+      <CustomButton
+        text={'Generate Password'}
+        btnFunc={() => generatePassword()}
+      />
+      {error && (
+        <Text style={{fontSize: 15, color: '#f5475e', textAlign: 'center'}}>
+          {error}
+        </Text>
+      )}
+      {/* Result Password Container */}
+      {isPasswordGenerated && (
+        <View style={styles.passwordResultContainer}>
           <Text style={styles.passwordResultText}>Your Password</Text>
           <Text style={styles.passwordText}>{password}</Text>
-          <CustomButton text={'Reset Password'} btnFunc={() => resetPassword()}/>
-        </View>)}
+          <CustomButton text="Copy to clipboard" btnFunc={copyToClipboard} />
+          {isPasswordCopied && (
+            <Text style={{fontSize: 15, color: '#6fed8d'}}>
+              Password Copied to Your Clipboard
+            </Text>
+          )}
+          <CustomButton
+            text={'Reset Password'}
+            btnFunc={() => resetPassword()}
+          />
+        </View>
+      )}
 
       {/* Reset Password Btn */}
-
     </SafeAreaView>
   );
 }
@@ -231,10 +262,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
-    backgroundColor: "#d5ecf0",
-   marginHorizontal: 40,
-   borderRadius: 20,
-   paddingVertical: 20
+    backgroundColor: '#d5ecf0',
+    marginHorizontal: 40,
+    borderRadius: 20,
+    paddingVertical: 20,
   },
   passwordResultText: {
     fontSize: 20,
@@ -243,7 +274,7 @@ const styles = StyleSheet.create({
   passwordText: {
     fontSize: 20,
     fontWeight: 300,
-    marginTop: 20
+    marginTop: 20,
   },
 });
 
